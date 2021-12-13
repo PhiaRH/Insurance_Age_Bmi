@@ -1,0 +1,262 @@
+---
+title: "Influence of Age and BMI on US Insurance Costs"
+author: "Phia Rau Halleen"
+date: "12/12/2021"
+output: 
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**#Introduction:**
+For this project, I am using the data set "insurance.csv" to examine the potential relationship between an individuals age and the insurance charges they receive, as well as the potential relationship between an individuals BMI (body mass index) and their insurance charges. I am focusing on these variables (of the seven in the data set) because of the noted presence of ageism and fat phobic discrimination in the medical field, and the insurance industry as an extension of that. Insurance is not cheap or free in the United States. With this, there is a certain misnomer that insurance costs more for individuals with preexisting conditions — many of which do not have to be medical — the age of the main insurer, number of dependents and individuals BMI are all charted to determine the cost of insurance charges. This means that individuals with preexisting conditions, such as age and BMI, are going to be charged for the same care as people who "cost less" in the eyes of the insurance company. In the US currently, individuals with a BMI above 30 (30<= considered obese, 25<= X >= 28 considered overweight) are expected to pay 25% to 50% more for insurance than individuals with a BMI of less than 30. About 42.4% of the US population currently has a BMI of 30 or above. That means that about 139.7 million Americans are paying more for insurance, and likely receive less quality care too. The same goes for individuals 55 and over, however, their percentage of the US population is . 
+between the cost "charges" of US insurance, and an individuals age, as well as an individuals BMI.
+
+Because of the presence of discrimination in the medical field, I am carrying out this analysis to see if there is a positive correlation relationship between the age/bmi of the individual and the charges they incurred. I am predicting that a as the age or BMI of the individual increases, as will the charges. 
+ 
+```{r}
+library(readr)
+```
+
+**#The dataset:** 
+"insurance.csv" was pulled off of kaggle "https://www.kaggle.com/mirichoi0218/insurance". It was initally used in the textbook "Machine Learning with R" by Brett Lantz. There is currently not a known year for the dataset. 
+
+From first glance, the dataset has 1338 observations across seven variables. The seven variables are "age", "sex", "bmi", "children" (i.e. the number of dependents under 18), "smoker", "region" (of the United States: broken down into Northeast, Northwest, Southwest or Southeast), and lastly "charges" (amount of money an individual is billed by their insurance company). The variables I am specifically interested in for this analysis are the variables of "age", "bmi" and "charges". 
+
+```{r}
+library("dplyr")
+library("ggplot2")
+library(readxl)
+insurance_data<-read.csv("insurance.csv", header = TRUE)
+str(insurance_data)
+summary(insurance_data)
+```
+
+
+**#Visualizations:**
+For the visualizations, I first used tidyverse to filter out the specific variables I wanted. For the bmi variable, I filtered out for a bmi more than or equal to 30, as well as less than or equal to 30 
+```{r}
+bmi_over_30.1<-insurance_data%>%
+  filter(bmi >=30,)
+
+
+
+bmi_under_30<-insurance_data%>%
+  filter(bmi <=30,)
+
+```
+
+I also filtered out what I was looking for for the age variable, specifically less than or equal to 55, and more than or equal to 55. I specified the age 55 to be the cut off because usually 55 is the age that insurees can expect to pay more compared to their younger counterparts. 
+```{r}
+age_under_55<-insurance_data%>%
+  filter(age <=55, na.rm = TRUE)
+
+
+```
+
+```{r}
+age_over_55<-insurance_data%>%
+  filter(age >=55,)
+
+```
+
+For all of the visualizations, I chose charges as the y or "response" variable because I was interested in checking the potential influence of age or bmi on the charges. For the visualizations, I also stuck with a scatter plot because of both my experience with this visualization, and because I wanted to physically see the potential outliers outside of the line of best fit. First, I visualized BMI and charges, and then age and charges without the best fit line. The graphs I made were of: the whole BMI sample, individuals with a BMI of 30 or above, and 30 or below. I then applied the best fit line to this graphs, in that order. 
+
+```{r}
+ggplot(data=insurance_data, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI range")
+```
+
+```{r}
+ggplot(bmi_over_30.1, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI over 30")
+```
+
+```{r}
+ggplot(data=bmi_under_30, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI under 30")
+```
+
+```{r}
+ggplot(data=insurance_data, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0,) + 
+  geom_smooth(method = "lm", se = TRUE, fill="orange")+
+    xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI range")
+```
+
+```{r}
+ggplot(data=bmi_over_30.1, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = TRUE, fill = "orange")+
+    xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI over 30")
+```
+
+```{r}
+ggplot(data=bmi_under_30, aes(x=bmi, y=charges, color=bmi,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = TRUE, fill = "orange")+
+    xlab("BMI")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for BMI less than 30")
+```
+
+
+I then visualized the age and charges variable. I first graphed the whole sample (ages 18-64), then individuals 55 and above, and finally individuals 55 and below. Afterward I applied the best fit line to these graphs.
+```{r}
+ggplot(data=insurance_data, aes(x=age, y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals 18-64")
+```
+
+```{r}
+ggplot(data=age_over_55, aes(x=age, y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals 55 to 64")
+```
+
+
+```{r}
+ggplot(age_under_55,aes(x=age,y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+  xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals 18-55")
+```
+
+```{r}
+ggplot(data=insurance_data, aes(x=age, y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = TRUE, fill="orange")+
+ xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals Age 18-64")
+```
+
+```{r}
+ggplot(data=age_over_55, aes(x=age, y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = TRUE, fill="orange")+
+ xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals 55 to 64")
+```
+
+```{r}
+ggplot(data=age_under_55, aes(x=age, y=charges, color=age,))+
+  geom_point()+
+  scale_x_log10()+
+ geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = TRUE, fill="orange")+
+ xlab("Age")+
+  ylab("Insurance Charges")+
+  ggtitle("Insurance Charges for Individuals 18 to 55")
+```
+
+#Linear regression 
+I tested the correlation and linear regression between the variable (age or bmi) and the response variable (charges)
+
+First for correlation.
+
+```{r}
+cor(insurance_data$bmi,insurance_data$charges)
+
+cor(bmi_over_30.1$bmi,bmi_over_30.1$charges)
+cor(bmi_under_30$bmi, bmi_under_30$charges)
+
+```
+Of the three correlations tested, correlation for bmi versus charges, bmi above 30 and bmi under 30, the correlation was the highest between bmi and charges was largest for the whole sample, versus the filtered sample. Overall, the corrrelation was lower than expected.  
+```{r}
+cor(insurance_data$age,insurance_data$charges)
+
+cor(age_over_55$age,age_over_55$charges)
+cor(age_under_55$age,age_under_55$charges)
+```
+
+The correlation shows that for correlation was largest for the general age sample, then the sample of individuals 18-55. This went against my assumption. 
+
+```{r}
+age_and_charges_model<-lm(formula = charges ~ age, data = insurance_data)
+age_and_charges_model
+summary(age_and_charges_model)
+
+```
+
+```{r}
+bmi_and_charges_model<-lm(formula = charges ~ bmi, data = insurance_data)
+bmi_and_charges_model
+summary(bmi_and_charges_model)
+```
+
+
+```{r}
+single_obs_bmi<-tibble(age = 39, bmi = 31,)
+single_obs_bmi
+
+predict(bmi_and_charges_model, single_obs_bmi)
+```
+
+```{r}
+single_obs_age<-tibble(age = 55, bmi = 31)
+single_obs_age
+predict(age_and_charges_model, single_obs_age)
+```
+
+```{r}
+single_obs_age_and_sex_and_bmi<-tibble(age = 39, bmi = 31, sex = "female",)
+single_obs_age_and_sex_and_bmi
+predict(age_and_charges_model, single_obs_age_and_sex_and_bmi)
+predict(bmi_and_charges_model, single_obs_age_and_sex_and_bmi)
+
+single_obs_older_female<-tibble(age = 62, bmi = 31, sex = "female",)
+single_obs_older_female
+predict(age_and_charges_model, single_obs_older_female)
+```
+
+
+
+**#Conclusions:**
+One of the biggest takeaways from this analysis was that the relationship I predicted between age/bmi and charges was not as large as I  was expecting. Because of the literature around ageism and fat-discrimination in the medical and social work fields, I assumed that the data may reflect that, at least to a moderate level, however it did not. However, when including the prediction model for both age and bmi, the prediction does show that older adults did pay more, as well as those with a higher bmi. When combining the two, age and bmi, the charges were significantly higher. When then including the variable "sex" this increased the charges for the individual as well, especially when filtering for "female". This implies that this issue of ageism and fatphobia needs to be studied more interdisciplinary in nature, as including sex fit more with my inital hypothesis. In the future, studying this issue should be taken from an interdisciplinary lens. 
+
+**Questions for further analysis**
+How does the year of the charge inform the amount individuals are charged? 
+How would including race and class impact the outcome of the study? 
+What further information should be collected to give a
+Can this data set be generalized to the whole US population, and if not what data needs to be collected in order to make this possible? (e.g. class, income, race, sexual orientation, marital status, citizenship status?)
+
